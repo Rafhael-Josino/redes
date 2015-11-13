@@ -1,0 +1,180 @@
+Kurose/Perkins - IP Móvel
+
+-4 funções abstratas do protocolo IP móvel:
+	-readdressing (home/agent network)
+	-associating (location directory)
+	-delivering to COA
+	-inverting readdressing (foreign agent ou protocolo DHCP)
+
+-remote redirection -> securuty
+
+-Aqui é estudado o modelo de IP móvel com protocolo IETF
+-IETF: Internet Engineering Task Force
+-Um modelo mais antigo é o Columbia IP Móbile:
+	-MSRs
+	-Problema de escalabilidade: multicast
+
+-Para estudar mais sobre redes ad-hoc: IEEE 802.11 Comittee (1997)
+	-camadas de rede, transporte e aplicação mais importantes.
+
+-Physical e link layers -> identificar quando mudar o attachtment
+
+Middleware Components: nomadic services
+-vistos como parte do SO pelas aplicações
+-diferentes de agentes inteligentes, que são entidades separadas
+1-Service Location Protocol (SLP): UA, SA e DA
+2-Link Adaptiving
+-problema quanto à padronização das características dos links, das APIs
+e relações com as outras camadas. Mais difícil para conexões wireless
+3-Profile Management: profile manager
+4-Enviroment Manager
+
+mobile node: changes its point of attachment into the network ovet time
+mobilidades sob diferentes perspectivas
+-quão móvel é uma rede do ponto de vista da comada de network?
+níveis de mobilidade
+-quão importante é para o endereço de um nó móvel permanecer o mesmo?
+o endereço IP de um laptop tem de ser o mesmo enquanto trafega entre redes?
+-Que infraestruturas de fio de suporte estão disponível?
+se dois usuários estão nas proximidades de comunicação um com o outro, eles
+podem estabelecer um conexão de rede na falta de qualquer outra infraestru-
+tura de camada de rede? -> Redes ad hoc proveem essa capacidade.
+
+conexões a IP móveis diretas e indiretas.
+um dos usos: tornar a mobilidade transparente para as aplicações de rede
+
+Home Network: casa permanente do nó móvel.
+Home Agent:
+-entidade com o home network que faz a performace das funções de
+gerenciamento de mobilidade do nó móvel.
+-três formas de implementação:	sistema separado
+				junto ao router com rede física
+				ou com rede virtual
+	
+-Foreing/Visiting Network: a rede na qual o nó móvel está atualmente 
+residindo
+-Foreing Agent: entidade com  a foreing network que ajuda o nó móvel com as 
+funções de gerenciamento de mobilidade
+-Correspondent: entidade querendo se comunicar com o nó móvel
+
+-Propagação da informação da rota altamente específica para o endereço 
+permanente, oriunda da foreing network, por meio dos updates normais de
+rede.
+Um problema significante disso é a escalabilidade.
+
+-Foreing agent: create a COA (care-of address)
+There are then two addresses associated with the mobile node:
+	-permanent address: identify the node
+	-COA, aka foreing address: locate the node
+	-directory with the 2 address associated
+Its second role is to inform the home agent that the node is in its network
+and has the given COA.
+This method is used in the pratice.
+-2 modos de obtenção do COA:
+	-Obtido pelo agent advertisement do foreign agent
+	-Obtido pelo nó, por meios externos, como DHCP ou CDPD address
+
+
+
+
+More things have to be done beyond simply address a datagram to the mobile
+node's permanent address and send it into the network-layer infrastructure.
+Two approaches can be done: direct and indirect.
+
+->Indirect Routing to a Mobile Node:
+Send first to the permanent address
+It doesn't know if the mobile node is in the home or in the foreing network
+The mobility is completely transparent to the correspondent
+Home agent:
+	track COA
+	redirect datagrams to the mobile node:	2 steps:
+1º-forward to the foreing agent using mobile node's COA (new datagram)
+2º-forward from the foreing agent to the node (original datagram)
+	encapsulate the original datagram into a larger one, so the 
+application in the node doesn't know it was send from the home agent.
+To return a datagram, the node can send directly to the correspondent, 
+using its permanent address as source and the correspondent's address as
+destiny.
+-A mobile-node - to - foreing-agent protocol: register and deregister
+-A foreing-agent - to - home-agent registration protocol: the foreing
+agent the COA with the home agent, but doesn't explicity deregister.
+-A home-agent datagram encapsulation protocol
+-A foreing-agent desencapsulation protocol
+Problem of inefficiency: triangle routing problem
+
+->Direct Routing to a Mobile Node:
+Overcomes the triangle routing problem, but increases its complexity
+Introduction of a correspondent agent, that takes the COA from the home
+agent and than tunnels datagrams directly to the mobile node.
+Introduces 2 challenges:
+	-It is required a mobile-user location protocol to get the COA
+	-Updating the COA at the home agent is not anymore sufficent when 
+the mobile node change of foreing network
+A solution adopted is the use of an anchor foreing agent.
+When the mobile node changes of network, the new foreign agent contacts 
+the anchor foreign in order to set up forwarding to this new foreign network
+
+Mobile IP:
+Many operation modes
+-with or without a foreign agent 
+-miultiple ways for agents and nodes to discover each other
+-use of single or multiple COAs
+-multiples forms of encapsulation
+
+home agents
+foreing agents
+care-of addresses
+encapsualtion/desencapsulation
+
+Three separate functions:
+Agent discovery: define protocolos usados por um agente (home/foreing)
+para advertir seus serviços a nós móveis e protocolos para nós móveis 
+solicitarem serviços de um agente (home/foreing)
+
+Registration with the home agent: protocolos usados pelos nós móveis e/ou
+foreing agent para registrar e desesregistrar COAs com um mobile node's 
+home agent. Dependendo do tipo de método de attachment, o nó móvel pode
+registrar o COA diretamente com o home agent ou por meio do foreign agent
+
+Tunneling: maneira na qual datagramas são passados a
+frente para nós móveis ou home agent, tunelando os datagramas para o COA,
+incluindo regras para esses datagramas, para lidar com erros e várias
+formas de encapsulação.
+
+Security considerations not aborded here.
+
+Agent discovery:
+-Via advertsiment: advertises its services. Periodically broadcasts an ICMP
+message with type 9 (router discovery) on all connected links. It uses an
+extension of a protocol. More important fields of this protocol:
+	Home agent bit
+	Foreign agent bit
+	Registration required bit
+	M, G encapsulation
+	Care-of fields
+
+-Via solicitation: the mobile node broadcasts an agent solicitation msg,
+simply an ICMP message with type value 10. An agent which receives the msg
+unicasts an agent advertisement directly to the mobile node
+
+Eegistration of a COA at the home agent:
+Can be done by the foreign agent or by the mobile node
+
+4 steps to the first case:
+-
+-
+-
+-
+
+Mensagens de controle: request and reply
+-UDP com porta 434
+-Extensões: type|length|data
+type: o q fazer com a msg em caso de não reconhecimento da extensão
+length: usado para saber quantos bits pular para achar a próxima ext.
+-Set das extensões nas mensagens de redistro de IP móvel e
+nas ICMP router discovery messages.
+
+
+
+Francisco Siqueira - atlântico gerente:
+everton@cpqd.com.br

@@ -1,0 +1,50 @@
+NAT
+Escassez de endereços IPs:
+-pequenas/médias empresas com ligação dial-up, ADSL ou cabo querem IPs
+para as suas máquinas (também usuários domésticos).
+-cada um pode ter mais do que uma máquina por trás.
+Solução: Network Address Translation
+Vantegens:
+-Privacidade do estrutura interna de uma rede
+-Utilização de fusão entre redes com endereços duplicados
+-Facilidade de mudança de ISP:
+	-troca apenas o endereço externo
+...
+Utilização:
+-Endereços privados não são permitidos na internet.
+-Roteadores não fazem o encaminhamento destes IPs na internet
+(Interface pública e interface privada no roteador)
+...
+Tipos de NAT
+-básico
+-bidirecional
+-NAPT
+-Overlapping
+
+As entradas podem ser:	-estáticas
+			-dinâmicas
+
+Implementação:
+-datagramas saindo: trocar (IP origem, # porta) para (IP NAT, # NAT)
+...
+
+IPv6:
+-Endereços maiores: 16 bytes
+-Criação de níveis de endereçamento hierárquico
+-Header de formato flexível - datagrama incompatível com IPv4
+	-headers opcionais
+-Opções aprimoradas - recursos adicionais
+-Extensão do Protocolo - transição para permitir recursos adicionais
+-Autoconfiguração e Renumeração
+
+
+fragmentação fim-a-fim
+não trabalha associado com mudança de rota
+	tem que ir para rotas com MTU maior
+	MTU ->	fixo para cada protocolo de camada de enlace
+não tem máscara
+modificação na url
+não tem broadcast, mas unicast, multicast, e anycast 
+					(1 pra 1 de muitos)
+ipv6.br
+

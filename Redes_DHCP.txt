@@ -1,0 +1,3 @@
+Atribuição de endereços:
+Endereços IP e configurações da placa de rede podem ser obtidos
+-manualmente: trabalhoso em redes de grande dimensão

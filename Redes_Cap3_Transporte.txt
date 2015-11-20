@@ -1,0 +1,377 @@
+Camada de Transporte
+
+-comunicação fim-a-fim entre origem e destino
+-comunicação lógica entre processos de aplicação executados em diferentes hospedeiros;
+-protocolo de transporte executam em sistemas terminais;
+-Tipos de serviços:
+TCP - com conexão
+UDP - sem conexão
+-Unidade de dados:
+TCP:segmento
+UDP:datagrama
+
+Principais funções:
+-Controle de fluxo fim-a-fim - buffer do host
+-Controle de congestionamento - buffer do hoteador
+-Controle da sequência de dados 
+-Detecção e recuperação de erros
+-Multiplexação/demultiplexação de várias conexões de transporte em uma 
+conexão de rede
+
+Transporte X rede
+(processo)   (máquina)
+
+Multiplexação/demultiplexação
+-comum aos dois protocolos
+-baseadas em nº de portas e endereços IP de remetente e receptor
+	-numa porta de remetente/receptor em cada segmento
+-Multiplexação:
+	juntar dados de múltiplos processos de aplicação envelopando    dados com cabeçalho (usado depois para demultiplexação)
+-Demultiplixação:
+	entrega dos segmentos recebidos para os precessos da camada de  aplicação corretos
+
+usar as portas p/ multiplexação;  
+
+Atribuição de portas:
+-atribuidas pelo IANA - www.iana.org/assignments/port-numbers
+-distribuição das portas:
+	Portas bem conhecidas
+	-atribuidas pelo IANA; só podem ser usadas por usuários
+	privilegiados(root) ou por programas executados por usuários
+	privilegiados; variam de 0 a 1023
+	Portas registradas
+	-podem ser executadas por processos ou programas de usuários comuns
+	-variam de 1024 a 49151
+	Portas dinâmicas ou privadas
+	-não podem ser registradas
+	-variam de 49152 e 65535
+-em teoria, acima de 1023, estaria livre para uso dos usuários, porém, pode
+haver conflitos
+	-para não haver conflitos, a aplicação deve ser enviada para    registro no IANA
+
+Protocolo UDP - User Datagram Protocol
+-Serviços
+transferência de dados não confiável
+multiplexação/demultiplexação
+detecção de erro
+não orientado a conexão
+sem controle de congestionamento
+sem controle de fluxo
+não garante sequência dos datagramas
+
+-Utilizado em aplicações de tempo-real e multiponto
+-É não confiável
+	Confiabilidade deve ser uma preocupação da apli q faz uso do UDP
+-Por que existe UDP?
+-Não há estabelecimento de de conexão que possa redundar em atrasos
+-Simples: não há estado de transmissão no transmissor nem no receptor
+-Cabeçalho de segmento reduzido
+-Não há controle de congestionamento: UDP pode enviar segmentos tão     rápido quanto desejado (e possível)
+
+Formato de Mensagens:
+datagrama de usuário -> dividida em duas partes:
+	cabeçalho UDP
+	área de dados UDP - tam máx: 65536 - 8
+
+0		 16		    31
+UDP source port	  |UDPdestination port
+UDP message length|UDP checksum
+		Data
+		...
+ 
+Pseudocabeçalho
+
+Encapsulamento UDP: orientado a mensagem
+	encapsula mensagens da aplicação
+					Cabeçalho UDP |Area de dados UDP
+			Cabeçalho IP |	Area de dados IP
+Cabeçalho de quadros |	Area de dados do Quadro
+
+TCP:
+-utilizado quando há necessidade de transmissão confiável de streams
+-cria serviço de confiabilidade em cima do serviço não confiável do IP
+-segmentos em paralelos
+-ACKs cumulativos
+-único temporizador de retransmissão (timeout e ACKs duplicados)
+-necessidade transmissão confiável de streams de pacotes
+(stream of bytes)
+-ponto-a-ponto: um rementente e um destinatário
+-orientado a fluxo:	sem limites de mensagens
+			fluxo desestruturado
+-encapsula bytes da aplicação
+(balde com uma torneira de água)
+-buffers de envio e recepção: transmissão bufferizada
+-conexão full-duplex: dados bidirecionais fluem na mesma conexão
+-orientado a conexão:
+	-apresentação (troca de mensagens de controle) inicia estado do 
+	remetente e destinatário antes da troca de dados
+	-conexão de circuito virtual (endereçar os processos)
+-fluxo controlado: remetente não sobrecarga destinatário
+(o cliente tem q ter um buffer maior)
+
+Estrutura do segmento TCP
+<----------32 bits------------>
+porta origem | porta destino
+número de sequência acumulativo 
+número de reconhecimento (próximo byte esperado)
+comprimento do cabeçalho/n usado/flags/janela recepção
+soma verificação/ponteiro dados urg
+opções (tamanho variável)
+dados da aplicação (tamanho variável)
+<------------------------------>
+U|A|P|R|S|F flags (bits): dados urgentes, ack, push, reset, syn, fin
+(três últimos servem para gerenciamento da conexão)
+janela de recepção (tamanho do buffer disponível)
+soma verificação (da mesma forma do UDP)
+ponteiro de dados urgentes
+
+-TCP considera que os erros que podem acontecer são devidos apenas a
+congestionamento
+
+Portas TCP
+-acesso a multiplos programas em determinada máquina
+	demultiplexação: portas de protocolo
+-usa a conexão, não a porta do protocolo, como sua abstração fundamental
+conexões são identificadas por um par de end points
+-ponto terminal: par de numeros inteiro (host,porta)
+	host: endereço IP
+	porta: uma porta TCP naquele host
+-conexão consiste num circuito virtual estabelecido por dois pontos 
+terminais, um no transmissor e outro no receptor
+-Devido ao TCP identificar a conexão por um par de pontos terminais, umaporta TCP pode ser compartilhada por múltiplas conexões na mesma máquina
+-combina a associação dinâmica e estática de portas de forma similar ao UDP
+-portas TCP e UDP independentes e iguais para os serviços acessíveis porambos os protocolos.
+
+Segmentos TCP
+-Divide o stream de bytes em segmentos para transmissão. Normalmente    cada segmento trafega na internet em um único datagrama IP
+-Janela deslizante é utilizada para garantir a transmissão e realizar 
+controle de fluxo
+-Janela deslizante TCP opera com octetos. Os octetos do stream são 
+numerados  sequencialmente e o transmissor mantém 3 ponteiros associadosa cada conexão com a finalidade de controlar o fluxo.
+
+Número de sequência e ACKs do TCP:
+-nºs de sequência: "número" na cadeia de bytes do 1º byte nos dados do  segmento
+-ACKs: nº de sequencia do próximo byte esperado do outro lado
+	ACK cumulativo
+
+Numeração por byte
+ACK por segmento (de bytes)
+
+Confiabilidade
+-confirmação positiva com retransmissão
+-receptor se comunica com a origem retornando uma msg de confirmação ACK à medida que recebe os dados.
+-transmissor mantém registro de cada pacote e aguarda o ACK antes de 
+enviar o próximo pacote
+-transmissor inicia um timer para reenvio de pacote se necessário.
+
+(conta)
+stop and wait:
+receptor do ACK com um timer
+pacote n chega, timer expira, reenvia o byte
+(ineficiente -> sol: janela deslizante)
+
+piggybackuo: um pacote de dados também envia a confirmação
+
+Sliding Windowns:
+:mandar múltiplos pacotes antes de receber a confirmação dos primeiros
+dentro da capacidade da janela (no buffer).
+:tamanho da janela calculado de forma que quando chegar o ultimo byte,
+o reconhecimento do o primeiro está chegando
+(também vale para a camada de enlace)
+
+Tempo de ida e volta  e timeout do TCP:
+-como definir o valor de timeout do TCP?
+:maior que RTT: mas RTT varia
+:muito curto: timeout prematuro > transmissões desnecessárias
+:muito longo: baixa reação a perda de segmento
+
+-como estimar o RTT?
+SampleRTT
+:tempo medido da transmissão do segmento até receber o ACK
+:ignora retransmissões
+SampleRTT irá variar
+:queremos RTT estimado "mais estável"
+:média de várias medições recentes, não apenas da SampleRTT atual	
+
+Tempo de ida e volta e timeout TCP:
+->estimatedRTT = (1-a)*EstimatedRTT + a*SampleRTT
+
+-média móvel exponencia ponderada (EWMA)
+	-influência da amostra passada cai exponencialmente rápido
+	-valor típico: a =0.125
+
+-definindo o timeout:
+	-primeira estimativa de qnt SampleRtt se desvia de EstimatedRTT:->DevRtt = (1-B)*DevRTT + B*|SampleRtt-EstimatedRTT|
+	-geralmente B = 0.25
+	-depois, definir timeout: 
+->TimeoutInterval = EstimatedRTT + 4*DevRTT
+
+timeout estimado para o primeiro byte e depois optimizado para os outros
+
+TCP cria serviços de confiabilidade em cima do serviço não confiável IP
+Segmentos em paralelo
+ACKs cumulativos
+TCP usa único temporizador de retransmissão, disparado por:
+	-eventos de timeout
+	-ACKs duplicados
+
+Eventos de remetente TCP
+-dados recebidos da aplicação:
+	-cria segmentos com número de sequência
+	(número de sequência é o número da cadeia de bytes do primeiro byte no segmento)
+	-inicia temporizador, se ainda não tiver iniciado 
+	(para o segmento mais antigo sem ACK)
+	-intervalo de expiração: TimeoutInterval
+-timeout:
+	-retransmite segmento que causou timeout
+	-reinicia temporizador
+-ACK recebido:
+	-reconhecem-se segmentos sem ACK anteriores
+	(atualiza o que sabidamente tem ACK)
+	(inicia temporizador se houver segmentos pendentes)
+	SandBase = (valor do ACK)//variável do transmissor
+
+TCP: Cenários de retransmissão
+-cenário de ACK perdido
+-timeout prematuro
+-cenário ACK cumulativo
+
+TCP: Geração de ACK
+evento:					Ação do TCP destinatário:
+-chegada normal de seg esperado		-ACK retardado,enviado se um seg
+com todo os dados ja reconhecidos	seguinte na ordem n chegar no t.
+-chegada normal de seg esperado com	-envio imediato de um ACK
+outro seg esperado aguardando ACK	cumulativo p/ambos seg na ordem
+-chegada de seg fora da ordem com	-envio imediato de ACK duplicado
+nº higher than expected (lacuna) 	da extremidade lower da lacuna
+-chegada de um seg q preenche toda	-envio imediato de ACK, contando
+ou n a lacuna de dados recebidos	q o seg comece na lower part
+
+Retransmissão rápida:
+-Periodo de timeput relativamente grande:
+	-longo atraso antes de reenviar o pacote perdido
+-Detecta segmentos perdidos por meio de ACKs duplicados:
+	-remetente geralmente envia muitos segmentos um após o outro
+	-se o segmentos for perdido, provavelmente haverá muitos ACKs 
+	duplicados para ele.
+-Se o remetente recebe 3 ACKs para os mesmos dados, ele supõe que o seg.após dados com ACK doi perdido:
+	-retransmissão rápida: reenvia segmento antes que o temporizador	expire (dentro do limite de tempo do timeout)
+
+Quantidade de segmentos enviados por vez relacionado com tamanho do buffer
+
+Gerenciamento da conexão TCP:
+-remetente e destinatário TCP estabelecem "conexão" antes de trocar data-inicializa variáveis TCP:
+	-números de sequência
+	-buffers, informação de controle de fluxo
+-cliente: inicia conexão
+	-Socket clientSocket = new Socket("hostname","port X");
+-servidor: contactado pelo cliente
+	-Socket connectionSocket = welcomeSocket.accept();
+
+Apresentação via três vias (three-way handshake):
+-1: hosp.client envia segmento SYN do TCP ao servidor
+	-especifica nº seq. inicial
+	-sem dados
+-2: hosp.server recebe SYN, responde com segmento SYNACK
+	-servidor local aloca buffers
+	-especifica nº de ser. inicial do servidor
+-3: cliente recebe SYNACK, responde com segmento ACK, que pode conter 
+dados
+
+Fechando uma conexão TCP:
+-cliente fecha socket: clientSocket.close();
+-1: cliente envia segmento de controle TCP FIN ao servidor
+-2: servidor recebe FIN, responde com ACK, fecha conexão(cli), envia FIN
+-3: cliente recebe FIN, responde com ACK
+	-entra em espera temporizada - responderá com ACK aos FINs
+-4: servidor recebe ACK - conexão fechada(ser)
+
+Rever mapas de abertura e fechamento de conexão TCP e ciclo de vida!!!
+
+Janela variável e Controle de Fluxo:
+-o tamanho da janela TCP pode variar ao longo da transmissão
+-cada confirmação contém um window adversiment que define quantos octetos de dados adicionais o receptor está preparado para aceitar 
+	-compativel com o buffer do receptor
+-a janela pode ser aumentada ou diminuida - na diminuição devem ser     considerados valores que não entrem em contradição com notificações     anteriores
+		-é possível o envio de segmentos com bit URG ativado    mesmo com janela zero
+		-há sondagem enquanto a janela permanecer zero
+
+------------------------------------------------------------------------
+datagramas ---> espaço de buffer    |dados TCP   ---> Processo de apli.
+IP		(atualmente) n usado|(no buffer)
+		<       rwnd       >
+		<            RcvBuffer         >
+------------------------------------------------------------------------
+
+-O processo da aplicação pode ser lento na leitura do buffer
+-Controle de fluxo: remetente não estourará buffer do destinatário 
+transmitindo muitos dados rapidamente
+-Serviço de compatibilidade de velocidades:compatibiliza a taxa de enviodo remetente com a leitura da aplicação receptora
+-Espaço de buffer n utilizado:(sem descarte de seg fora de ordem do DES
+rwnd = RcvBuffer-[LastByteRcvd -  LastByteRead]
+-Destinatário: anuncia espaço no buffer incluindo o valor de rwnd no    cabeçalho do segmento.
+-Remetente:-limita número de bytes com ACK a rwnd
+	   -garante que buffer do destinatário não estoure
+-Visa a não sobrecarregar o ponto terminal, mas pode haver sobrecarga   dos pontos intermediários.
+
+Principios de Controle de Congestionamento:
+-congestionamento:
+	-informalmente:"muitas fontes enviando muitos dados muito rápido para a rede tratar"
+	-diferente de controle de fluxo!
+-manifestações:
+	-pacotes perdidos (estouro de buffer nos roteadores)
+	-longos atrasos (enfileiramento nos buffers do roteador)
+-um dos maiores problemas da rede!
+
+-Ex de problema de congestionamento:
+	-Problema da variação na taxa de transmissão no roteadores 
+		-Jitter-
+	-Sol: atrasando a reprodução 	
+		-Bufferização-
+
+Técnicas para controle de congestionamento
+-controle de congestionamento fim a fim:
+	-nenhum feedback explícito da rede
+	-congestionamento deduzido da perda e atraso observados pelo 
+	sistema final
+	-técnica tomada pelo TCP
+-controle de congestionamento assistido pela rede:
+	-roteadores oferecem feedback aos sistemas finais
+	-único bit indicando congestionamento(SNA,DECbit,TCP/IP,ECN,ATM)
+	-taxa explícita que o remetente deve enviar no enlace da saída
+
+Controle de congestionamento TCP. Busca por largura de banda
+-procura por largura de banda:
+	-aumenta taxa de transmissão no recebimento do ACK até ppor fim 	o correr  perda; depois diminui a taxa de transmissão
+	-continua a aumentar no ACK, diminui na perda (pois a largura de
+	disponível está mudando, dependendo de outras conexões de rede
+	-comportamento "dente de serra"
+-remetente limita taxa limitando número de bytes sem ACK "na pipeline"
+	LastByteSend-LastByteAcked <= cwnd
+	cwnd: difere de rwnd (como, por que?)
+	remetente limitado por min(rwnd,cwnd)
+-aproximadamente: taxa = cwnd/RTT bytes/seg
+-cwnd é dinâmico: função do congestionamento de rede percebido
+-evento perda de segmento: reduzindo cwnd
+-evento ACK recebido: aumenta cwnd
+-timeout: -sem resposta do destinatário
+	  -corta cwnd para 1
+-3 ACKs duplicados: -pelo menos alguns segmentos passando
+		    (lembrar da transmissão rápida)
+		    -corta cwnd pela metade menos agressivamente do que  		    o evento de timeout
+-fase da partida lenta: aumento exponencialmente rápido (apesar do nome no inicio da conexão, ou após timeout
+			após timeout
+-prevenção de congestionamento: aumento linear
+				uso do ssthresh
+-quando cwnd > ssthresh, cresce cwnd de forma linear:
+	-aumenta cwnd em 1 segmento por RTT
+	-aborda possível congestionamento mais lento que na partida
+-modo de recuperação rápida: diminuição multiplicativa.
+			     acontece quando há perda de 3 ACKs
+
+-aimd: Additive Increase Multiplicative Decrease
+	ACKs: aumenta cwnd em 1 MSS por RTT: aumento aditivo
+	perda: corta cwnd ao meio (perda sem timeout detectado)
+	       diminuição multiplicativa
+-Há três estados no respectivo diagrama:
+	partida lenta, recuperação rápida e prev de congestionamento

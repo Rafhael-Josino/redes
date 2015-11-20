@@ -67,13 +67,17 @@ Classes de pacotes
 tamanho máximo 2¹⁶
 
 Datagrama IP - Type of Service
-usa bits 8 ao 15
+usa bits 8 ao 15 (da primeira linha do datagrama)
 -Original:
 0, 1 e 2:precedência
 3, 4 e 5:delay, throughput, reliability (DTR)
 6 e 7:não usados
 -Atual (2015):
-codepoint|pool|ponto de código|atribuido por
+0 a 5: codepoint:
+	pool	ponto de código	atribuído por
+	1	xxxxx0		organização de padrões
+	2	xxxx11		local ou experimental
+	3	xxxx01		local ou experimental
 6 e 7 não usados
 
 Fragmentação leva à:
@@ -82,6 +86,7 @@ Fragmentação leva à:
 -aumento da probabilidade de perda
 -aumento do overhead 
 A remontagem só ocorre no destino
+Em que camada acontece a fragmentação? (enlace?)
 
 prefixo + sufixo = 32 bits
 ID rede   ID máquina
@@ -95,44 +100,35 @@ classfull: quando foi projetado -> classes de endereço: A,B,C,D e E
 
 255.255.255.255 -> broadcast da própria rede
 
-Classe A: o primeiro bit é fixo (0), R M M M
-Faixa de endereços classe A:
-	0. até 127.
--0 -> identificar uma máquina na prórpria rede
--127 -> loopback, acessar a própria rede
+Classe A: Primeiro bit é fixo (0), R M M M
+Faixa de endereços classe A: 0.0.0.0 até 127.255.255.255
+-0. ... 	-> identificar uma máquina na prórpria rede
+-127. ... 	-> loopback, acessar a própria rede
 Loopback: 127.0.0.1 -> localhost
 
-Classe B: dois primeiros bits fixos (1,0), R R M M
-Faixa de endereços classe B:
-	128. até 191. 
+Classe B: 2 primeiros bits fixos (1,0), R R M M
+Faixa de endereços classe B: 128.0.0.0 até 191.255.255.255 
 
-Classe C: tres primeiros bits fixos (1,1,0) R R R M
-Faixa de endereços:
-	192. até 223.
+Classe C: 3 primeiros bits fixos (1,1,0) R R R M
+Faixa de endereços: 192.0.0.0 até 223.255.255.255
 
-Os bits fixos formam uma lei de formação
-
-Classe D: endereço de multicast: grupo de estações
+Classe D: 4 primeiros bits fixos (1 1 1 0)
+	  endereço de multicast: grupo de estações
 	  útil para transmissões multimídia
 	  manda um pacote para um grupo
 	  os membros desse grupo podem estar em diferentes redes
 	  no caso acima, pode haver duplicação dos pacotes
 	  reduzir o tráfego de dados| polpa largura de banda
-Faixa de endereços:
-	224. até 239.
+Faixa de endereços: 224.0.0.0 até 239.255.255.255
 
-Classe E: Reservados para uso de público
+Classe E: Reservados para uso de público|futuro
 	  Pra porra nenhuma
-Faixa de endereços:
-	240. até 247.
-!!
-Ataque reflexivo:(DBOS)
-ping com broadcast para uma rede
-IP Spoot: devolver o ping para um alvo -> sobrecarregá-lo
-!!
+Faixa de endereços: 240.0.0.0 até 247.255.255.255
 
-Deperdício de endereços de máquinas por endereço de rede.
-Otimização: em vez da classes, adotar subredes.
+-Os bits fixos formam uma lei de formação.
+-Deperdício de endereços de máquinas por endereço de rede.
+-Otimização: em vez da classes, adotar subredes.
+-No IPv6 a fragmentação não é feita nos roteadores
 
 Endereços especiais:
 -todos os bits em 0: este host|loopback
@@ -140,9 +136,6 @@ Endereços especiais:
 -todos os bits em 1: broadcast local
 -bits da máquina em 1: broadcast direcionado
 -127.qualquer valor: loopback
-
-
-No IPv6 a fragmentação não é feita nos roteadores
 
 Fragmento:
 ID

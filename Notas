@@ -1,0 +1,9 @@
+!!
+Ataque reflexivo:(DBOS)
+ping com broadcast para uma rede
+IP Spoot: devolver o ping para um alvo -> sobrecarregá-lo
+!!
+
+Camada de rede:
+-rever checksum, flags de serviço
+??dividir offset por 2³??

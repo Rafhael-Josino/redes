@@ -1,0 +1,370 @@
+Camada de Rede:
+-Protocolos de roteamento: permitir que os roteadores troquem info. 
+sobre as redes as quais eles estão conectados
+Info. -> possibilitar o envio de datagramas pelas rotas corretas ao 
+	destino
+-Selecionar os caminhos dos pacotes da origem até o destino
+-Funções:
+	endereçamento
+	tipo de serviço
+	roteamento
+-Endereçamento lógico
+-Oferece dois tipos de serviço: com conexão e sem conexão
+-Não tem função em redes de difusão
+
+Endereçamento:
+-Hierárquico:
+	endereço formado pelos vários níveis do qual faz parte
+	vantegens no que diz respeito ao roteamento
+	Ex: endereço IP
+	analogia: CEP
+-Horizontal:
+	não há relação entre o endereço e sua localização
+	administração global dos endereços
+	mais utilizado em uma rede local
+	Ex: IEEE 802
+
+Serviço sem conexão - Datagrama:
+-baseado em datagrama
+-cada pacote que sai tem o endereço da máquina de destino
+-cada roteador tem uma tabela de roteamento: perguntar qual o melhor 	
+caminho para cada outro roteador para chegar a máquina tal
+
+Serviço orientado a conexão - Circuito virtual:
+-baseado em circuito virtual
+-estabelecer um caminho
+-tabelas com caminhos estabelecidos
+-os pacotes carregam o número do circuito virtual utilizado
+
+			    Datagrama             Circuito virtual
+Estabelecimento de conexão: desnecessário         obrigatório
+Processamento do roteador:  maior a cada pacote   maior no estabelecimento do CV
+Endereçamento		    Completo por pacote   ident de CV em cada pacote
+Info de estado		    desnecessário	  espaço em tabelas para cada CV
+Roteamento		    cada pacote indepen	  pacotes seguem msm rota do CV
+Efeito na falha dos roters  menor		  maior(reestabelecimento do CV)
+Controle de cong e QdS      mais difícil	  buffers pré alocados
+
+O protocolo IP:
+-não confiável
+-sem conexão
+-hierárquico
+	-classes A, B, C, D e E (hoje(2015) usa-se um sistema classless
+-serviço de melhor esforço, mas não garante nada ("envie e reze")
+-fragmentação e remontagem dos pacotes
+-identificação da importância do datagrama e da confiabilidade exigida
+-campo para identificação do protocolo de transporte
+-roteamento adaptativo (dinâmico) distribuido pelos gateways
+	-pode ser utilizado roteamento default e rotas estáticas
+-descarte e controle de tempo de vida dos pacores no gateway
+
+Flags de serviço
+(original)
+Bits de precedência
+Classes de pacotes 
+(atual)
+...
+tamanho máximo 2¹⁶
+
+Datagrama IP - Type of Service
+usa bits 8 ao 15
+-Original:
+0, 1 e 2:precedência
+3, 4 e 5:delay, throughput, reliability (DTR)
+6 e 7:não usados
+-Atual (2015):
+codepoint|pool|ponto de código|atribuido por
+6 e 7 não usados
+
+Fragmentação leva à:
+-aumento do precessamento do roteador
+-aumento do retardo no recebimento
+-aumento da probabilidade de perda
+-aumento do overhead 
+A remontagem só ocorre no destino
+
+prefixo + sufixo = 32 bits
+ID rede   ID máquina
+(routing prefix + host number)
+
+classfull: quando foi projetado -> classes de endereço: A,B,C,D e E
+				-> identificar quem é prefixo e sufixo
+-Tem dois endereços de máquinas que nunca podem ser usados:
+	-endereço da rede: todos os bits de máquina setados no 0
+	-endereço de broadcast: bits de máquina todos 1 (direcionado)
+
+255.255.255.255 -> broadcast da própria rede
+
+Classe A: o primeiro bit é fixo (0), R M M M
+Faixa de endereços classe A:
+	0. até 127.
+-0 -> identificar uma máquina na prórpria rede
+-127 -> loopback, acessar a própria rede
+Loopback: 127.0.0.1 -> localhost
+
+Classe B: dois primeiros bits fixos (1,0), R R M M
+Faixa de endereços classe B:
+	128. até 191. 
+
+Classe C: tres primeiros bits fixos (1,1,0) R R R M
+Faixa de endereços:
+	192. até 223.
+
+Os bits fixos formam uma lei de formação
+
+Classe D: endereço de multicast: grupo de estações
+	  útil para transmissões multimídia
+	  manda um pacote para um grupo
+	  os membros desse grupo podem estar em diferentes redes
+	  no caso acima, pode haver duplicação dos pacotes
+	  reduzir o tráfego de dados| polpa largura de banda
+Faixa de endereços:
+	224. até 239.
+
+Classe E: Reservados para uso de público
+	  Pra porra nenhuma
+Faixa de endereços:
+	240. até 247.
+!!
+Ataque reflexivo:(DBOS)
+ping com broadcast para uma rede
+IP Spoot: devolver o ping para um alvo -> sobrecarregá-lo
+!!
+
+Deperdício de endereços de máquinas por endereço de rede.
+Otimização: em vez da classes, adotar subredes.
+
+Endereços especiais:
+-todos os bits em 0: este host|loopback
+-bits da rede em zero: host nesta rede
+-todos os bits em 1: broadcast local
+-bits da máquina em 1: broadcast direcionado
+-127.qualquer valor: loopback
+
+
+No IPv6 a fragmentação não é feita nos roteadores
+
+Fragmento:
+ID
+MF
+Offset
+
+??dividir offset por 2³??
+
+Um datagrama pode no máximo passar por 2⁸ roteadores, mas cada sistema tem seu
+valor.
+
+Tabela de roteamento
+-presente nos host e routers
+-apenas endereços de rede
+-endereço da rede de destino e o router para o "next hop"
+Informações básicas:
+-endereço IP de destino:completo de um host
+			de rede (todos os host dela)
+-endereço IP do próximo router (next-hop router): msm rede física
+-interface de rede, através da qual o datagrama deve ser enviado
+-tipo de entrada: protocolo usado para geração de entrada da tabela
+			
+Roteamento direto e indereto:
+-decisão do host
+-direto: host de origem e destino estão na msm rede física
+	-encapsulamento num quadro Ethernet
+	-mapeia endereço num endereço físico
+	-envia o quadro através da rede Ethernet
+-indireto:
+	-gateway
+
+Strict source rout: lista de roteadores pelos quais precisam ser passados
+-se um datagrama chega a um nó que não é adjacente diretamente ao próximo nó na 
+strict source rout, o datagrama não vai para frente -> emissão de um ICMP error
+(internet consource message protocol) ao remetente e aponta o nó que deu erro.
+Loose source rout: lista de roteadores pelos quais devem ser passados
+-não ocorre como no caso acima.
+
+Source routing: inserção de dados de roteamento no datagrama pelo nó de origem
+	razões:policy routing, debugging e:
+-abilitar novas rotas que não foram advertidas antes (mais importante para IP móvel).
+
+Endereço IPv4: espaço de endereço disponível: 2³² |Todos os endereços IPv4 já foram usados.
+	 IPv6: 2¹²⁸ |Há endereços sufucientes
+
+
+Chegando na rede de destino, usa-se o endereço físico.
+
+Protocolo de roteamento IP original:
+->Algoritmo de roteamento IP original:
+-Extrair endereçamento IP de destino "H" do datagrama e calcular o endereço da rede de destino "N"
+Se "N" é uma rede Diretamente Conectada
+	entregar o datagrama à interface de rede,
+senão se há uma rota específica para "H"
+	rotear o datagrama de acordo com a tabela
+senão se há entrada na tabela de notas para "N"
+	rotear o datagrama de acordo com a tabela
+senão se a tabela possui uma rota default
+	rotear o datagrama para o roteador default
+senão
+	declarar erro de roteamento
+-ordem de procura: msm rede, rota específica para H, para N, default
+
+Cada placa de rede pode ter mais de um endereço
+Prefixo -> IANA (orgão de atribuição de endereço)
+Sufixo -> administrador:estático
+			dinâmico
+			(DHCP)
+conectivadade local: autoatribuição: endereço 169.254/16
+
+Extensões de endereçamento:
+-Crescimento inesperado X Endereço Classfull
+-Surgimento de extensões para economia e otimização do uso dos endereços de rede
+	-Sub-rede
+	-Rede não numerada
+	-CIDR
+
+Classless: hoje (2015) ele é assim
+-Classless Interdomain Routing (CIDR)
+-as máscaras tem comprimento variado: as sub-redes tem comprimento variado
+tabela de rotas: pares: máscara/rota
+
+faixa: 172.16.0.1 - 172.16.3.254
+
+Divisão de uma rede IP:
+Principais objetivos:
+-Utilização de um único IP address (classfull) por mais de uma rede fis
+-otimização da utilização dos endereços IP
+	-Deperdício de endereços de máquinas por endereço de rede.
+	-Otimização: em vez da classes, adotar subredes.
+-esconder do resto da internet os detalhes da organização interna 
+Funcionamento da sub-rede IP:
+-hostid do endereço IP é dividido em subnetid+hostid
+-divisão em sub-redes
+-bits de sub-rede
+-máscara de sub-rede: bits:
+	-Rede e sub-rede -> 1
+	-Máquina -> 0
+-questão do congestionamento por causa do broadcast: aos 20% do tráfego usado pela rede
+-verificação de máscaras cadastradas para onde enviar os dados
+-router: faz AND bit a bit entre o endereço de destino de um pacote e a
+máscara de sub-rede de cada entrada da sua tabela de roteamento até 
+encontrar uma coincidência. Resultado: endereço rede 
+-Convenção: não usar os endereços da primeira e última sub-rede da rede
+
+Algoritmo de roteamento IP atual (após sub-redes) (2015)
+-Retirar IP destino do datagrama (Id) e calcular IP da rede (In)
+-se In é diretamente conectado, entregar à interface de rede
+-senão, fazer AND bit-a-bit para cada máscara da tabela com Id
+-se N == endereço da rede de entrada, rotear datagrama p/próximo passo
+-fim do loop for
+-se não forem encontradas coincidências:declarar erro de roteamento
+
+Sub-redes de tamanho variável (VLSM)
+-objetivo: flexibilidade
+-perigo: ambiguidade de endereço
+-cuidados especiais na configuração dos routers - o RIP versão 1 não
+identifica as redes classless
+
+Endereçamento classless e super-redes
+-reduzir o tamanho das tabelas e do tráfego de roteamento
+-fornecer múltiplos endereços de rede para uma única organização
+-ná prática um conjunto de redes é reunido em uma única rede (superrede)
+
+Switch: camada de enlace/nível 2 -> endereço físico (MAC)
+IP -> endereço físico: protocolo ARP
+ARP request -> endereço broadcast (MAC)
+	-quem é IP x?
+	-End destino: FF:FF:FF:FF:FF:FF
+	-End origem: IP e MAC
+ARP reply IP x -> MAC x_correspondente
+-MAC address armazenado em cache
+-Dinamicamente armazenado
+Reverse ARP:	-descobrir o IP, tendo o MAC
+(RARP)		-precursor do DHCP
+-Mapeamento de 1 para 1: não permite a rotatividade de usuário numa net
+-Atribui endereços de forma permanente
+-Feito em hardware: mais complicado de programar
+-Cada subrede tem que ter um servidor RARP/não é roteável
+-Atribui IP mas não máscara
+
+BOOTP: melhorar as deficiências do RARP
+-serviço da camada de aplicação
+-provê uma estação diskless com um endereço IP
+-usa msgs UDP
+-manda para o endereço de broadcast
+-faz endereço automático, mas não dinâmico
+
+DHCP:
+-alocação temporária de endereços IP
+	-tempo de aluguel
+	-diferente de cashe
+-seu cliente poderá adquirir...
+
+Configurações:
+-Manual:
+-Automática:
+-Dinâmica:
+-característica principal do DHCP
+-IP address é alocado a um determinado equipamento temporariamente
+-Em intervalos de tempo pré-definidos deve haver uma atualização
+-pode desconectar da rede e manter seu enderço IP
+-o tempo do RARP deve ser menor que o de aluguél
+
+Servidor:
+Cliente:
+
+4 etapas para pegar o endereço com DHCP
+-Discover: mensagem do cliente em broadcast
+	DHCPDISCOVER
+-Resposta offer do servidor
+	DHCPOFFER
+-Requisição formal por Request, em broadcast
+	DHCPREQUEST
+-Servidor reconhece o uso de IP pelo cliente
+	DHCPACK/DHCPNAK
+-Configuração completa
+-Deligamento
+	DHCPRELEASE	
+	
+Renovação da concessão:
+-dois temporizadores
+
+DHCP Relay:
+-recebe msgs e encaminha para o servidor de DHCP
+-servidor responde pro relay, que reponde para o cliente
+
+Parâmetros de configuração:
+
+
+Roteamento
+-roteadores não usam flat addressing
+-entradas: sub-redes, endereçamento topológico, assumem que host com o
+ mesmo prefixo de roteamento podem compartilhar uma rota em comum
+
+ICMP: Internet Control Message Protocol
+-Utilizado para que roteadores enviem mensagens de controle ou de erro
+para outros roteadores ou hosts que tenham emitidos pacotes IP
+	-somente origem é informada
+	-o programa ping utiliza ICMP
+-Erros em mensagens ICMP não geram novas mensagens ICMP
+-Não há prioridades. Há apenas "best effort"
+-Mensagens ICMP são transportes encapsuladas em pacores IP
+
+!!
+Ping da morte: 
+Tamanho máximo de um datagrama IP: 2¹⁶
+ping é uma aplicação que utiliza o ICMP: socket RAW
+da morte: envio de um datagrama com pacote maior que a capacidade max
+hoje (2015), não é mais possível fazer isso
+!!
+
+Formato da msg ICMP:
+Type Code Checksum
+campo opcional
+
+Ex: request, reply, TTL, 
+
+Transição v4->v6:
+-Túnel
+-Pilha dupla
+
+VPN
+-tunelamento
+

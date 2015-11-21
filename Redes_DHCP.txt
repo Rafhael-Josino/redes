@@ -1,59 +1,129 @@
 Atribuição de endereços:
 Endereços IP e configurações da placa de rede podem ser obtidos
 -manualmente: trabalhoso em redes de grande dimensão
+-dinamicamente: por meio de algum mecanimos: protocolos
+Principais parâmetros:
+-Endereço IP;
+-Máscara de sub-rede;
+-Gateway padrão;
+-Endereço IP dos servidores DNS;
 
-RARP:
+RARP: broadcast limitado para acessar seu servidor 
+-é necessário um servidor em cada rede
+	-não passa pelos roteadores -> não é roteável
+-faz um broadcast de requisição de um endereço IP
+-resposta com um IP
+-apenas atribui endereço, não o roteador default nem a máscara
+	-não atribui dinamicamente;
+-acesso direto ao hardware -> difícil operação
+-subutiliza o quadro
 
-BOOTP: melhorar as deficiências do RARP
+BOOTP (1985): melhorar as deficiências do RARP
 -serviço da camada de aplicação
 -provê uma estação diskless com um endereço IP
--usa msgs UDP
--requere configuração manual da tabelas 
+-usa msgs UDP, encaminhadas pelos routers
+-requere configuração manual da tabelas de mapeamento IP <-> MAC
 -atua na camada de rede
--incluem informação adicional
+-incluem informação adicional: máscara, roteador, servidor de aquivos..
 -manda para o endereço de broadcast
 -faz endereço automático, mas não dinâmico
 
-funcionamento
+Funcionamento BOOTP:
+-requisição na rede usando IP de difusão
+-servidor BOOTP responde por difusão
+-segurança é responsabilidade do cliente, protocolos passíveis de perda
+-permite várias respostas, mas só processa a primeira
+-em caso de perda, usa o TIMEOUT para retransmissão
 
-DHCP:
--alocação temporária de endereços IP
-	-tempo de aluguel
-	-diferente de cashe
--seu cliente poderá adquirir...
+DHCP (1993):
+-uma extensão do BOOTP
+	-alocação temporária ("leases") de endereços IP
+		-tempo de aluguel
+		-diferente de cache
+	-seu cliente poderá adquirir todos os parâmetros de configuração IP necessários para operar, em uma única mensagem
+-mesmos números da porta BOOTP
+-DHCP pode interoperar com clientes BOOTP
 
-Configurações:
--Manual:
--Automática:
--Dinâmica:
+Atribuição de endereços: 3 configurações:
+Manual
+-fixa um determinado IP a uma máquina de rede, por meio do endereço MAC
+-funcionamento semelhante ao BOOTP
+Automática
+-atribui um endereço a um equipamento da rede por tempo indeterminado
+-na primeira vez que um nó se conecta na rede, recebe um IP permanente
+Dinâmica
 -característica principal do DHCP
--IP address é alocado a um determinado equipamento temporariamente
--Em intervalos de tempo pré-definidos deve haver uma atualização
--pode desconectar da rede e manter seu enderço IP
+-endereço IP alocado a um determinado equipamento temporariamente
+-em intervalos de tempo pré-definidos deve haver uma atualização
+-mesmo IP pode ser utilizado por nós diferentes em momentos diferentes
+-pode desconectar da rede e manter seu endereço IP
 -o tempo do RARP deve ser menor que o de aluguél
 
+Componentes:
 Servidor:
+-configurar tempo de alocação
+-máquinas com configuração manual
+-formas de fornecimento de endereço
+-faixa de endereços a ser distribuída
+-pode responder mensagens BOOTP e DHCP
 Cliente:
+-equipamento que está configurado para solicitar um IP ao servidor
 
-4 etapas para pegar o endereço com DHCP
+Conversa DHCP
+4 passos entre o cliente (UDP 68) e o servidor (UDP 67)
 -Discover: mensagem do cliente em broadcast
 	DHCPDISCOVER
--Resposta offer do servidor
+-Offer: Resposta "use este endereço" do servidor
 	DHCPOFFER
--Requisição formal por Request, em broadcast
+-Request: Requisição formal em broadcast
 	DHCPREQUEST
--Servidor reconhece o uso de IP pelo cliente
-	DHCPACK/DHCPNAK
+-Servidor reconhece o uso de IP pelo cliente, aceita ou rejeita
+	DHCPACK/DHCPNACK
 -Configuração completa
 -Deligamento
-	DHCPRELEASE	
-	
+	DHCPRELEASE
+
+DHCPDECLINE: cliente notifica o servidor que o endereço está em uso
+
 Renovação da concessão:
 -dois temporizadores
+-T1 < T2 < Tempo de concessão (lease time)
+	T1 valor padrão = 1/2 tempo de lease (aluguel)
+	T2 valor padrão = 7/8 tempo de lease
+-comunicação via DHCPOFFER, DHCPACK
+-ações do cliente quando o tempo passa:
+	-T1: cliente deve renovar endereço com o servidor DHCP original
+	-T2: cliente deve renovar endereço com algum servidor DHCP
+	-Tempo de concessão: cliente deve parar de usar o endereço IP
+
+Fluxo de renovação:
+-T1 elapses:
+cliente manda unicast para seu servidor
+	DHCPREQUEST
+servidor responde
+	DHCPACK
+-Se esse servidor não responder até T2 elapses
+cliente manda broadcast 
+	DHCPREQUEST
+algum servidor tem de responder
+	DHCPACK
 
 DHCP Relay:
+-habilitam um servidor DHCP por domínio administrativo, além de um servidor por rede
+-necessita de um DHCP relay em cada rede
+-DHCP relay envia um pacote IP unicast para o servidor DHCP ae escutar um pacote broadcast IP local com DHCPDISCOVER
+-servidor DHCP seleciona um endereço IP dinâmico
+-servidor DHCP envia unicast ao endereço IP conhecido do DHCP relay, o qual envia aos endereços MAC locais dos hosts
+
 -recebe msgs e encaminha para o servidor de DHCP
--servidor responde pro relay, que reponde para o cliente
+-servidor responde para o relay, que reponde para o cliente
 
 Parâmetros de configuração:
+-máscara de rede
+-router
+-domínio
+-servidor DNS
+-Boot filename
+-...
+
 

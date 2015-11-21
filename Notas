@@ -37,3 +37,8 @@ Um datagrama pode no máximo passar por 2⁸ roteadores, mas cada sistema tem se
 MAC não é necessariamente o MAC da máquina com endereço IP destino desejado! Quando isto ocorre???
 
 ??estação diskless??
+??difusão??
+??
+DHCP relay: repasse da mensagem do servidor pelo relay (último passo)
+Parâmetros de configuração
+??

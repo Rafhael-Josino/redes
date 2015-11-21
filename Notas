@@ -1,9 +1,39 @@
-!!
+Notas interessantes:
+
 Ataque reflexivo:(DBOS)
 ping com broadcast para uma rede
-IP Spoot: devolver o ping para um alvo -> sobrecarreg�-lo
-!!
+IP Spoot: devolver o ping para um alvo -> sobrecarregá-lo
+
+Ping da morte: 
+Tamanho máximo de um datagrama IP: 2¹⁶
+ping é uma aplicação que utiliza o ICMP: socket RAW
+da morte: envio de um datagrama com pacote maior que a capacidade max
+hoje (2015), não é mais possível fazer isso
+
+######################################################################
+Dúvidas:
 
 Camada de rede:
--rever checksum, flags de servi�o
-??dividir offset por 2�??
+-rever checksum, flags de serviço
+
+??
+Fragmento:
+ID
+MF
+Offset
+??dividir offset por 2³??
+??
+Um datagrama pode no máximo passar por 2⁸ roteadores, mas cada sistema tem seu valor.
+??
+
+??autoatribuição??
+??
+-Utilização de um único IP address (classfull) por mais de uma rede física (instituições distintas, depertamentos de uma empresa)
+??
+
+??RIP (sub-redes de tamanho variável)
+
+??
+MAC não é necessariamente o MAC da máquina com endereço IP destino desejado! Quando isto ocorre???
+
+??estação diskless??

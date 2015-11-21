@@ -1,3 +1,59 @@
 Atribuição de endereços:
 Endereços IP e configurações da placa de rede podem ser obtidos
 -manualmente: trabalhoso em redes de grande dimensão
+
+RARP:
+
+BOOTP: melhorar as deficiências do RARP
+-serviço da camada de aplicação
+-provê uma estação diskless com um endereço IP
+-usa msgs UDP
+-requere configuração manual da tabelas 
+-atua na camada de rede
+-incluem informação adicional
+-manda para o endereço de broadcast
+-faz endereço automático, mas não dinâmico
+
+funcionamento
+
+DHCP:
+-alocação temporária de endereços IP
+	-tempo de aluguel
+	-diferente de cashe
+-seu cliente poderá adquirir...
+
+Configurações:
+-Manual:
+-Automática:
+-Dinâmica:
+-característica principal do DHCP
+-IP address é alocado a um determinado equipamento temporariamente
+-Em intervalos de tempo pré-definidos deve haver uma atualização
+-pode desconectar da rede e manter seu enderço IP
+-o tempo do RARP deve ser menor que o de aluguél
+
+Servidor:
+Cliente:
+
+4 etapas para pegar o endereço com DHCP
+-Discover: mensagem do cliente em broadcast
+	DHCPDISCOVER
+-Resposta offer do servidor
+	DHCPOFFER
+-Requisição formal por Request, em broadcast
+	DHCPREQUEST
+-Servidor reconhece o uso de IP pelo cliente
+	DHCPACK/DHCPNAK
+-Configuração completa
+-Deligamento
+	DHCPRELEASE	
+	
+Renovação da concessão:
+-dois temporizadores
+
+DHCP Relay:
+-recebe msgs e encaminha para o servidor de DHCP
+-servidor responde pro relay, que reponde para o cliente
+
+Parâmetros de configuração:
+

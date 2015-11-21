@@ -144,48 +144,40 @@ Offset
 
 ??dividir offset por 2³??
 
-Um datagrama pode no máximo passar por 2⁸ roteadores, mas cada sistema tem seu
-valor.
+Um datagrama pode no máximo passar por 2⁸ roteadores, mas cada sistema tem seu valor.
+
+Roteamento:
+-processo de escolha de uma rota através da qual pacotes serão enviados
+-rotas são armazenadas em tabelas de roteamento
 
 Tabela de roteamento
--presente nos host e routers
--apenas endereços de rede
--endereço da rede de destino e o router para o "next hop"
-Informações básicas:
--endereço IP de destino:completo de um host
-			de rede (todos os host dela)
--endereço IP do próximo router (next-hop router): msm rede física
--interface de rede, através da qual o datagrama deve ser enviado
--tipo de entrada: protocolo usado para geração de entrada da tabela
-			
+-presente nos host e routers;
+-ideal a manutenção do menor número de informações possíveis;
+-apenas endereços de rede devem ser armazenados;
+-tabela típica: endereço da rede de destino e o routeador para o "next hop";
+
 Roteamento direto e indereto:
--decisão do host
--direto: host de origem e destino estão na msm rede física
-	-encapsulamento num quadro Ethernet
-	-mapeia endereço num endereço físico
+-decisão do host 
+-direto: hosts de origem e destino estão na mesma rede física (Ex: Ethernet)
+	-emissor encapsula o datagrama IP num quadro Ethernet
+	-mapeia endereço IP num endereço físico
 	-envia o quadro através da rede Ethernet
--indireto:
-	-gateway
+-indireto: host de origem e destino não estão na mesma rede física
+	-emissor envia o datagrama IP ao gateway
+	-o gateway é responsável pelo próximo passo
+	-chegando na rede de destino, usa-se o endereço físico.
 
-Strict source rout: lista de roteadores pelos quais precisam ser passados
--se um datagrama chega a um nó que não é adjacente diretamente ao próximo nó na 
-strict source rout, o datagrama não vai para frente -> emissão de um ICMP error
-(internet consource message protocol) ao remetente e aponta o nó que deu erro.
-Loose source rout: lista de roteadores pelos quais devem ser passados
--não ocorre como no caso acima.
-
-Source routing: inserção de dados de roteamento no datagrama pelo nó de origem
-	razões:policy routing, debugging e:
--abilitar novas rotas que não foram advertidas antes (mais importante para IP móvel).
-
-Endereço IPv4: espaço de endereço disponível: 2³² |Todos os endereços IPv4 já foram usados.
-	 IPv6: 2¹²⁸ |Há endereços sufucientes
-
-
-Chegando na rede de destino, usa-se o endereço físico.
+Tabelas de roteamento típicas:
+-endereço IP de destino: 
+	endereço completo de um host.
+        endereço de rede (todos os hosts dela).
+-endereço IP do próximo router (next-hop router): roteador conectado a mesma rede física.
+-interface de rede: através da qual o datagrama deve ser enviado
+-tipo de entrada: protocolo usado para geração de entrada da tabela
 
 Protocolo de roteamento IP original:
-->Algoritmo de roteamento IP original:
+-Algoritmo original:
+-Ordem de procura: msm rede, rota específica para H, para N, default
 -Extrair endereçamento IP de destino "H" do datagrama e calcular o endereço da rede de destino "N"
 Se "N" é uma rede Diretamente Conectada
 	entregar o datagrama à interface de rede,
@@ -197,7 +189,19 @@ senão se a tabela possui uma rota default
 	rotear o datagrama para o roteador default
 senão
 	declarar erro de roteamento
--ordem de procura: msm rede, rota específica para H, para N, default
+
+Strict source rout: lista de roteadores pelos quais precisam ser passados
+-se um datagrama chega a um nó que não é adjacente diretamente ao próximo nó na strict source rout, o datagrama não vai para frente. 
+	-nesse caso de erro: emissão de um ICMP error ao remetente e aponta o nó que deu erro.
+Loose source rout: lista de roteadores pelos quais devem ser passados
+-não ocorre como no caso acima.
+
+Source routing: inserção de dados de roteamento no datagrama pelo nó de origem
+	razões:policy routing, debugging e:
+-abilitar novas rotas que não foram advertidas antes (mais importante para IP móvel).
+
+Endereço IPv4: espaço de endereço disponível: 2³² |Todos os endereços IPv4 já foram usados.
+	 IPv6: 2¹²⁸ |Há endereços sufucientes
 
 Cada placa de rede pode ter mais de um endereço
 Prefixo -> IANA (orgão de atribuição de endereço)
@@ -213,20 +217,13 @@ Extensões de endereçamento:
 	-Rede não numerada
 	-CIDR
 
-Classless: hoje (2015) ele é assim
--Classless Interdomain Routing (CIDR)
--as máscaras tem comprimento variado: as sub-redes tem comprimento variado
-tabela de rotas: pares: máscara/rota
-
-faixa: 172.16.0.1 - 172.16.3.254
-
-Divisão de uma rede IP:
-Principais objetivos:
--Utilização de um único IP address (classfull) por mais de uma rede fis
+Divisão de uma rede IP: principais objetivos:
+-Utilização de um único IP address (classfull) por mais de uma rede física (instituições distintas, depertamentos de uma empresa)
 -otimização da utilização dos endereços IP
 	-Deperdício de endereços de máquinas por endereço de rede.
-	-Otimização: em vez da classes, adotar subredes.
+	-Otimização: em vez da classes, adotar sub-redes.
 -esconder do resto da internet os detalhes da organização interna 
+
 Funcionamento da sub-rede IP:
 -hostid do endereço IP é dividido em subnetid+hostid
 -divisão em sub-redes
@@ -235,19 +232,23 @@ Funcionamento da sub-rede IP:
 	-Rede e sub-rede -> 1
 	-Máquina -> 0
 -questão do congestionamento por causa do broadcast: aos 20% do tráfego usado pela rede
+-um host não pode usar o primeiro e o último endenreço de uma sub-rede
+-a primeira e a última sub-rede não devem ser utilizdas (convenção)
 -verificação de máscaras cadastradas para onde enviar os dados
 -router: faz AND bit a bit entre o endereço de destino de um pacote e a
 máscara de sub-rede de cada entrada da sua tabela de roteamento até 
-encontrar uma coincidência. Resultado: endereço rede 
--Convenção: não usar os endereços da primeira e última sub-rede da rede
+encontrar uma coincidência. Resultado: endereço rede! 
 
 Algoritmo de roteamento IP atual (após sub-redes) (2015)
 -Retirar IP destino do datagrama (Id) e calcular IP da rede (In)
 -se In é diretamente conectado, entregar à interface de rede
--senão, fazer AND bit-a-bit para cada máscara da tabela com Id
--se N == endereço da rede de entrada, rotear datagrama p/próximo passo
--fim do loop for
+-senão, fazer AND bit-a-bit para cada entrada (máscara) da tabela de roteamento com Id.
+-se N == endereço da rede de entrada, rotear datagrama para próximo passo especificado.
+-fim_do_loop_for
 -se não forem encontradas coincidências:declarar erro de roteamento
+
+-Agora as máscaras entram na tabela de rotas.
+	-tabela de rotas: pares: máscara/rota
 
 Sub-redes de tamanho variável (VLSM)
 -objetivo: flexibilidade
@@ -256,80 +257,63 @@ Sub-redes de tamanho variável (VLSM)
 identifica as redes classless
 
 Endereçamento classless e super-redes
--reduzir o tamanho das tabelas e do tráfego de roteamento
--fornecer múltiplos endereços de rede para uma única organização
--ná prática um conjunto de redes é reunido em uma única rede (superrede)
+-reduzir o tamanho das tabelas e do tráfego de roteamento;
+-fornecer múltiplos endereços de rede para uma única organização;
+-ná prática um conjunto de redes é reunido em uma única rede; (super-rede)
 
-Switch: camada de enlace/nível 2 -> endereço físico (MAC)
-IP -> endereço físico: protocolo ARP
-ARP request -> endereço broadcast (MAC)
-	-quem é IP x?
-	-End destino: FF:FF:FF:FF:FF:FF
-	-End origem: IP e MAC
-ARP reply IP x -> MAC x_correspondente
--MAC address armazenado em cache
--Dinamicamente armazenado
-Reverse ARP:	-descobrir o IP, tendo o MAC
-(RARP)		-precursor do DHCP
+-Classless: hoje (2015) ele é assim
+
+Classless Inter-Domain Routing (CIDR)
+-reduz um bloco de endereços contínuos a uma única entrada; representada pelo par (endereço de rede, contagem);
+-não considera o conceito de classes;
+-implementação:
+	-um conjunto de endereços (contínuos) é atribuído;
+	-o nº de endereços é uma potência de 2 (totais, não usáveis)
+	-a entrada da tabela também contém o endereço base e quantidade de endereços de cada conjunto;
+
+Resolução de endereços:
+-Hosts e routers comunicam-se usando seus endereços MAC
+-Solução: mapeamentos estático e dinâmico
+-ARP (Address Resolution Protocol)
+	-resolução dinâmica de endereços IP em endereços MAC
+	-IP -> endereço físico: protocolo ARP
+
+-Switch: camada de enlace/nível 2 -> endereço físico (MAC)
+
+Funcionamento do ARP:
+-Estação de origem conhece apenas IP de destino de um pacote;
+	-envia um broadcast (enlace) à rede solicitando MAC do tal IP;
+	-ARP request -> endereço broadcast (MAC);
+	-quem é IP x?;
+	-End destino: FF:FF:FF:FF:FF:FF;
+	-End origem: IP e MAC;
+-Apenas estação de destino responde;
+	-ARP reply IP x -> MAC x_correspondente;
+-MAC address armazenado em cache visando à diminuição de broadcasts
+-No boot um pacote ARP é enviado para atualizar todas as estações de rede
+
+Encapsulamento do ARP:
+			mensagem ARP
+Header do quadro	área de dados do quadro
+
+Exemplo carteado:
+broadcast: sou (IP x_ip, MAC x_mac). Quem é IP y_ip?
+unicast: (IP x_ip, MAC x_mac), sou (IP y_ip, MAC y_mac)
+
+-Comando para visualisar cache de arp: arp (Windows e Unix)
+
+Reverse ARP (RARP):	
+-estações podem desconhecer seu IP (Ex: estações diskless)
+-elas perguntam seu IP à rede, e um servidor ARP/RARP responde
+-descobrir o IP, tendo o MAC
+-escolha do protocolo no campo Type do quadro Ethernet
+	-ARP=0x806 e RARP-0x8035
 -Mapeamento de 1 para 1: não permite a rotatividade de usuário numa net
 -Atribui endereços de forma permanente
 -Feito em hardware: mais complicado de programar
--Cada subrede tem que ter um servidor RARP/não é roteável
+-Cada sub-rede tem que ter um servidor RARP/não é roteável
 -Atribui IP mas não máscara
-
-BOOTP: melhorar as deficiências do RARP
--serviço da camada de aplicação
--provê uma estação diskless com um endereço IP
--usa msgs UDP
--manda para o endereço de broadcast
--faz endereço automático, mas não dinâmico
-
-DHCP:
--alocação temporária de endereços IP
-	-tempo de aluguel
-	-diferente de cashe
--seu cliente poderá adquirir...
-
-Configurações:
--Manual:
--Automática:
--Dinâmica:
--característica principal do DHCP
--IP address é alocado a um determinado equipamento temporariamente
--Em intervalos de tempo pré-definidos deve haver uma atualização
--pode desconectar da rede e manter seu enderço IP
--o tempo do RARP deve ser menor que o de aluguél
-
-Servidor:
-Cliente:
-
-4 etapas para pegar o endereço com DHCP
--Discover: mensagem do cliente em broadcast
-	DHCPDISCOVER
--Resposta offer do servidor
-	DHCPOFFER
--Requisição formal por Request, em broadcast
-	DHCPREQUEST
--Servidor reconhece o uso de IP pelo cliente
-	DHCPACK/DHCPNAK
--Configuração completa
--Deligamento
-	DHCPRELEASE	
-	
-Renovação da concessão:
--dois temporizadores
-
-DHCP Relay:
--recebe msgs e encaminha para o servidor de DHCP
--servidor responde pro relay, que reponde para o cliente
-
-Parâmetros de configuração:
-
-
-Roteamento
--roteadores não usam flat addressing
--entradas: sub-redes, endereçamento topológico, assumem que host com o
- mesmo prefixo de roteamento podem compartilhar uma rota em comum
+-precursor do DHCP -> RARP ainda apresenta uma série de desvantagens.
 
 ICMP: Internet Control Message Protocol
 -Utilizado para que roteadores enviem mensagens de controle ou de erro
@@ -340,17 +324,28 @@ para outros roteadores ou hosts que tenham emitidos pacotes IP
 -Não há prioridades. Há apenas "best effort"
 -Mensagens ICMP são transportes encapsuladas em pacores IP
 
-!!
-Ping da morte: 
-Tamanho máximo de um datagrama IP: 2¹⁶
-ping é uma aplicação que utiliza o ICMP: socket RAW
-da morte: envio de um datagrama com pacote maior que a capacidade max
-hoje (2015), não é mais possível fazer isso
-!!
+Encapsulamento ICMP:
+-Dados ICMP -> HEADER ICMP -> HEADER DATAGRAMA -> HEADER QUADRO
 
-Formato da msg ICMP:
-Type Code Checksum
+Formato da mensagem ICMP:
+0   8    16      31
+Type|Code|Checksum
 campo opcional
+
+-type: tipo da mensagem
+-code: códigos variados para algum tipo de mensagem
+-checksum: verficação de erro de mensagem ICMP inteira
+-optional: depende dos campos tipo e código
+
+Solicitação e reposta eco:
+-auxílio na depuração de problemas
+	-echo request e echo reply
+-solicitações de eco ICMP normalmente são implementadas pelo programa ping
+-formato da mensagem de request e reply
+
+Informação de destinos inalcançáveis:
+-quando um router não consegue encaminhar ou entregar um datagrama IP, envia uma mensagem de destination unreachable para o gerador do datagrama
+-após o envio da mensagem ICMP o pacote é descartado
 
 Ex: request, reply, TTL, 
 

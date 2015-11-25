@@ -29,12 +29,16 @@ Serviço sem conexão - Datagrama:
 -cada pacote que sai tem o endereço da máquina de destino
 -cada roteador tem uma tabela de roteamento: perguntar qual o melhor 	
 caminho para cada outro roteador para chegar a máquina tal
+-tabela de roteamento:
+
+Inicial		Later
+des|line	des|line
 
 Serviço orientado a conexão - Circuito virtual:
 -baseado em circuito virtual
 -estabelecer um caminho
 -tabelas com caminhos estabelecidos
--os pacotes carregam o número do circuito virtual utilizado
+-os pacotes carregam o número do circuito virtual utilizadow
 
 			    Datagrama             Circuito virtual
 Estabelecimento de conexão: desnecessário         obrigatório
@@ -42,8 +46,13 @@ Processamento do roteador:  maior a cada pacote   maior no estabelecimento do CV
 Endereçamento		    Completo por pacote   ident de CV em cada pacote
 Info de estado		    desnecessário	  espaço em tabelas para cada CV
 Roteamento		    cada pacote indepen	  pacotes seguem msm rota do CV
-Efeito na falha dos roters  menor		  maior(reestabelecimento do CV)
+Efeito na falha dos roters  menor		  maior (reestabelecimento do CV)
 Controle de cong e QdS      mais difícil	  buffers pré alocados
+
+Principais compontentes da camada de rede:
+-IP protocol
+-Routing component
+-Facility to report errors in datagrams and respond to requests 
 
 O protocolo IP:
 -não confiável
@@ -57,6 +66,57 @@ O protocolo IP:
 -roteamento adaptativo (dinâmico) distribuido pelos gateways
 	-pode ser utilizado roteamento default e rotas estáticas
 -descarte e controle de tempo de vida dos pacores no gateway
+
+Forwarding and addressing:
+IPv4:
+Datagram format:
+-version  number (4 bits): saber como lidar com o datagrama
+-header length (4 bits): 
+	daterminar onde realmente começa o datagrama
+	header de tamanho variável: tamanho típico: 20 bytes
+-type of service: distinguir tipos de datagrama
+-datagram length (16 bits): header + data	
+-identifier, flags, fragmentation offset: IP fragmentação
+-time-to-live (TTL): 
+-protocol: usado no destino final
+	   analogo a porta do socket
+	   interface transporte/network
+-checksum: detecção de erros no router só do header do datagrama
+-source and destination IP addresses:
+-options: influencia no tempo de processamento do datagrama
+-data (payload)
+
+IP Datagram Fragmentation:
+-limitação dos protocolos da camada link de tamanho de pacotes
+-maximum transmission unit: MTU
+-diferentes MTUs entre links diferentes -> problema
+-"imagine que você é um roteador" - Kurose
+-fragmentar os dados (payload) do IP datagram em outros menores (fragmentos) e encapsular cada parte em separados link layer frames
+-juntar os fragmentos nos pontos finais
+	-identificador
+	-flags: último pacote: 0, outros pacotes: 1
+	-offset: especificar onde um fragmento se encaixa no original
+-Ver exemplo do kurose, pag 364.
+-É complicado para routers e sistemas finais
+-Possibilidade de ataques
+
+IPv4 Addressing
+-IP associado com a interface, não com o host
+-dotted-decimal notation
+-IP globalmente unico, exceto em rede com NAT
+-subnet - tirar os hosts e routers e ver as ilhas formadas pelas interfaces
+-Classless Interdomain Routing: CIDR
+	-subnet addressing: a.b.c.d/x
+-Antes do CIDR, modelo classfull (explicado mais abaixo):
+	-partes da rede no IP já definidas: 8, 16, ou 24, A, B e C
+	-Péssimo aproveitamento de endereços.
+-255.255.255.255: broadcast
+	-routers podem passar para vizinhança
+		-normalmente não são configurados para fazer isso
+-Obtendo um bloco de endereços:
+-Ob
+
+
 
 Flags de serviço
 (original)
@@ -279,6 +339,9 @@ Resolução de endereços:
 	-IP -> endereço físico: protocolo ARP
 
 -Switch: camada de enlace/nível 2 -> endereço físico (MAC)
+-MAC destino não é necessariamente o MAC da máquina com endereço IP desejado!
+	-Isso ocorre quando: quando a máquina de destino está em outra sub-rede.
+	-Quadro enviado com MAC do próximo hop (como um router)	
 
 Funcionamento do ARP:
 -Estação de origem conhece apenas IP de destino de um pacote;

@@ -66,7 +66,8 @@ não garante sequência dos datagramas
 -Não há estabelecimento de de conexão que possa redundar em atrasos
 -Simples: não há estado de transmissão no transmissor nem no receptor
 -Cabeçalho de segmento reduzido
--Não há controle de congestionamento: UDP pode enviar segmentos tão     rápido quanto desejado (e possível)
+-Não há controle de congestionamento: UDP pode enviar segmentos tão rápido quanto desejado (e possível)
+-Só um processo por porta
 
 Formato de Mensagens:
 datagrama de usuário -> dividida em duas partes:
